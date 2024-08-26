@@ -19,11 +19,13 @@ class BlackScholes:
         else:
             self.time_list_display = [time_to_exp_days - (n*(np.ceil(time_to_exp_days/7))) for n in range(0,7)]
         self.price_range_display = []
-        #for i in range(0, 18):
-            # min is -100%
-            # take max bound as the given price_range_to_display
-            
-            
+        positive_bound = price_range_to_display
+        negative_bound = price_range_to_display
+        if price_range_to_display >= 100:
+            negative_bound = -1*max(-98, -1*price_range_to_display)
+        step_size = np.ceil((negative_bound + positive_bound)/18).astype(np.int64)
+        self.price_range_display = [self.current_underlying_price +self.current_underlying_price*(p/100) for p in range(-1*negative_bound, positive_bound,step_size)]
+        self.perc_price_range_display = [p for p in range(-1*negative_bound, positive_bound,step_size)]
         
     def calculate_price(self) -> Tuple[List[List[int]], List[List[int]]]:
         """Calculates value of European call and put option
@@ -57,5 +59,4 @@ class BlackScholes:
     @staticmethod
     def calculate_pnl(option_projected_val: List[int], amount_paid: int, denomination: str) -> List[int]:
         pass
-    
-    
+     

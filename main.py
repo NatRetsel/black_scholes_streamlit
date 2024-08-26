@@ -1,6 +1,6 @@
 import streamlit as st
 import math
-from st_btn_select import st_btn_select
+import numpy as np
 
 # Page configuration
 st.set_page_config(
