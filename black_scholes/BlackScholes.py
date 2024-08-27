@@ -57,6 +57,13 @@ class BlackScholes:
         pass
     
     @staticmethod
-    def calculate_pnl(option_projected_val: List[int], amount_paid: int, denomination: str) -> List[int]:
-        pass
+    def calculate_pnl(option_projected_val: List[List[int]], amount_paid: float, denomination: str) -> List[List[int]]:
+        pnl = [[0.0 for cols in range(0, len(option_projected_val[0]))] for rows in range(0,len(option_projected_val))]
+        if (denomination == 'P/L $' or denomination == 'P/L %'):
+            for r in range(0, len(option_projected_val)):
+                for c in range(0, len(option_projected_val[0])):
+                    pnl[r][c] = option_projected_val[r][c] - amount_paid
+                    if (denomination == 'P/L %'): 
+                        pnl[r][c] = (pnl[r][c] / amount_paid) * 100
+        return pnl
      

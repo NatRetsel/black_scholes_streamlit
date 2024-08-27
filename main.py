@@ -1,6 +1,10 @@
 import streamlit as st
 import math
 import numpy as np
+from black_scholes.BlackScholes import BlackScholes
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 # Page configuration
 st.set_page_config(
@@ -33,8 +37,32 @@ if time_to_exp_days < 7:
 else:
     time_list_display = [time_to_exp_days - (n*(math.ceil(time_to_exp_days/7))) for n in range(0,7)]
 
-
+b_scholes = BlackScholes(current_underlying_price, time_to_exp_days, strike_price, risk_free_rate, volatility, displayed_price_range)
 if heatmap_selection == 'Greeks':
     greek_selection = st.selectbox(label="Greek", options=greek_list)
     # generate heatmap of greeks
 # else generate PnL heatmaps
+else:
+    call_value, put_value = b_scholes.calculate_price()
+    fig_call, ax_call = plt.subplots(figsize=(10, 8)) # Call
+    fig_put, ax_put = plt.subplots(figsize=(10, 8)) # Put
+    # modify cmap colours RdGn & fix axes layout
+    if heatmap_selection == "Value":
+        sns.heatmap(call_value, xticklabels=time_list_display, yticklabels=np.round(b_scholes.price_range_display, 2), annot=True, fmt=".2f", cmap="RdYlGn", ax=ax_call)
+        sns.heatmap(put_value, xticklabels=time_list_display, yticklabels=np.round(b_scholes.price_range_display, 2), annot=True, fmt=".2f", cmap="RdYlGn", ax=ax_put)
+    ax_call.set_title('CALL')
+    ax_call.set_xlabel('DTE')
+    ax_call.set_ylabel('Spot Price')
+    ax_put.set_title('CALL')
+    ax_put.set_xlabel('DTE')
+    ax_put.set_ylabel('Spot Price')
+    
+col1, col2 = st.columns([1,1], gap="small")
+
+with col1:
+    st.subheader("Call Price Heatmap")
+    st.pyplot(fig_call)
+
+with col2:
+    st.subheader("Put Price Heatmap")
+    st.pyplot(fig_put)
