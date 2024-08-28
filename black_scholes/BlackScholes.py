@@ -24,7 +24,7 @@ class BlackScholes:
         if price_range_to_display >= 100:
             negative_bound = -1*max(-98, -1*price_range_to_display)
         step_size = np.ceil((negative_bound + positive_bound)/18).astype(np.int64)
-        self.price_range_display = [self.current_underlying_price +self.current_underlying_price*(p/100) for p in range(-1*negative_bound, positive_bound,step_size)]
+        self.price_range_display = [self.current_underlying_price +self.current_underlying_price*(p/100) for p in range(positive_bound, -1*negative_bound-1,-1*step_size)]
         self.perc_price_range_display = [p for p in range(-1*negative_bound, positive_bound,step_size)]
         
     def calculate_price(self) -> Tuple[List[List[int]], List[List[int]]]:
@@ -36,10 +36,11 @@ class BlackScholes:
         """
         call_prices = []
         put_prices = []
-        for dte in self.time_list_display:
+        print(self.price_range_display)
+        for underlying_price in self.price_range_display:
             call_row = []
             put_row = []
-            for underlying_price in self.price_range_display:
+            for dte in self.time_list_display:
                 d1 = (1/(self.volatility * np.sqrt(dte/365)))*(np.log(underlying_price/self.strike_price) +
                                                                (self.risk_free_rate+(self.volatility*self.volatility)/2)*(dte))
                 d2 = d1 - self.volatility*np.sqrt(dte)

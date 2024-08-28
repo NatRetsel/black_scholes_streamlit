@@ -44,19 +44,24 @@ if heatmap_selection == 'Greeks':
 # else generate PnL heatmaps
 else:
     call_value, put_value = b_scholes.calculate_price()
-    fig_call, ax_call = plt.subplots(figsize=(10, 8)) # Call
-    fig_put, ax_put = plt.subplots(figsize=(10, 8)) # Put
-    # modify cmap colours RdGn & fix axes layout
+    fig_call, ax_call = plt.subplots(figsize=(10,7)) # Call
+    fig_put, ax_put = plt.subplots(figsize=(10,7)) # Put
+    
     if heatmap_selection == "Value":
-        sns.heatmap(call_value, xticklabels=time_list_display, yticklabels=np.round(b_scholes.price_range_display, 2), annot=True, fmt=".2f", cmap="RdYlGn", ax=ax_call)
-        sns.heatmap(put_value, xticklabels=time_list_display, yticklabels=np.round(b_scholes.price_range_display, 2), annot=True, fmt=".2f", cmap="RdYlGn", ax=ax_put)
+        sns.heatmap(call_value, xticklabels=time_list_display, yticklabels=np.round(b_scholes.price_range_display, 2), annot=True, fmt=".2f", cmap="RdYlGn", ax=ax_call, cbar=False)
+        sns.heatmap(put_value, xticklabels=time_list_display, yticklabels=np.round(b_scholes.price_range_display, 2), annot=True, fmt=".2f", cmap="RdYlGn", ax=ax_put, cbar=False)
     ax_call.set_title('CALL')
     ax_call.set_xlabel('DTE')
     ax_call.set_ylabel('Spot Price')
-    ax_put.set_title('CALL')
+    
+    ax_put.set_title('PUT')
     ax_put.set_xlabel('DTE')
     ax_put.set_ylabel('Spot Price')
-    
+    plt.yticks(rotation=0)
+    plt.tight_layout()
+
+
+
 col1, col2 = st.columns([1,1], gap="small")
 
 with col1:
