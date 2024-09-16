@@ -42,13 +42,13 @@ class BlackScholes:
             put_row = []
             for dte in self.time_list_display:
                 d1 = (1/(self.volatility * np.sqrt(dte/365)))*(np.log(underlying_price/self.strike_price) +
-                                                               (self.risk_free_rate+(self.volatility*self.volatility)/2)*(dte))
-                d2 = d1 - self.volatility*np.sqrt(dte)
+                                                               (self.risk_free_rate+(self.volatility*self.volatility)/2)*(dte/365))
+                d2 = d1 - self.volatility*np.sqrt(dte/365)
                 # Call
-                call_price = norm.cdf(d1)*underlying_price - norm.cdf(d2)*self.strike_price*np.exp(-1*self.risk_free_rate*dte)
+                call_price = norm.cdf(d1,0,1)*underlying_price - norm.cdf(d2,0,1)*self.strike_price*np.exp(-1*self.risk_free_rate*(dte/365))
                 call_row.append(call_price)
                 # Put
-                put_price = norm.cdf(-1*d2)*self.strike_price*np.exp(-1*self.risk_free_rate*dte) - norm.cdf(-1*d1)*underlying_price
+                put_price = norm.cdf(-d2,0,1)*self.strike_price*np.exp(-self.risk_free_rate*dte/365) - norm.cdf(-d1,0,1)*underlying_price
                 put_row.append(put_price)
             call_prices.append(call_row)
             put_prices.append(put_row)
