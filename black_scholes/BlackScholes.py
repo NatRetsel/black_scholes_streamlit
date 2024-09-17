@@ -46,10 +46,10 @@ class BlackScholes:
                 d2 = d1 - self.volatility*np.sqrt(dte/365)
                 # Call
                 call_price = norm.cdf(d1,0,1)*underlying_price - norm.cdf(d2,0,1)*self.strike_price*np.exp(-1*self.risk_free_rate*(dte/365))
-                call_row.append(call_price)
+                call_row.append(round(call_price,3))
                 # Put
                 put_price = norm.cdf(-d2,0,1)*self.strike_price*np.exp(-self.risk_free_rate*dte/365) - norm.cdf(-d1,0,1)*underlying_price
-                put_row.append(put_price)
+                put_row.append(round(put_price,3))
             call_prices.append(call_row)
             put_prices.append(put_row)
         return (call_prices, put_prices)
@@ -63,8 +63,8 @@ class BlackScholes:
         if (denomination == 'P/L $' or denomination == 'P/L %'):
             for r in range(0, len(option_projected_val)):
                 for c in range(0, len(option_projected_val[0])):
-                    pnl[r][c] = option_projected_val[r][c] - amount_paid
+                    pnl[r][c] = round(option_projected_val[r][c] - amount_paid,3)
                     if (denomination == 'P/L %'): 
-                        pnl[r][c] = (pnl[r][c] / amount_paid) * 100
+                        pnl[r][c] = round((pnl[r][c] / amount_paid) * 100,3)
         return pnl
      
