@@ -36,11 +36,27 @@ if time_to_exp_days < 7:
     time_list_display = [d for d in range(time_to_exp_days,0,-1)]
 else:
     time_list_display = [time_to_exp_days - (n*(math.ceil(time_to_exp_days/7))) for n in range(0,7)]
-print("time to display: ", time_list_display)
+#print("time to display: ", time_list_display)
 b_scholes = BlackScholes(current_underlying_price, time_to_exp_days, strike_price, risk_free_rate, volatility, displayed_price_range)
 if heatmap_selection == 'Greeks':
     greek_selection = st.selectbox(label="Greek", options=greek_list)
     # generate heatmap of greeks
+    call_greeks, put_greeks = b_scholes.calculate_greeks(greek_selection)
+    fig_call, ax_call = plt.subplots(figsize=(10,7)) # Call
+    fig_put, ax_put = plt.subplots(figsize=(10,7)) # Put
+    
+    sns.heatmap(call_greeks, xticklabels=time_list_display, yticklabels=np.round(b_scholes.price_range_display, 2), annot=True, fmt=".2f", cmap="RdYlGn", ax=ax_call, cbar=False)
+    sns.heatmap(put_greeks, xticklabels=time_list_display, yticklabels=np.round(b_scholes.price_range_display, 2), annot=True, fmt=".2f", cmap="RdYlGn", ax=ax_put, cbar=False)
+    
+    ax_call.set_title('CALL')
+    ax_call.set_xlabel('DTE')
+    ax_call.set_ylabel('Spot Price')
+    
+    ax_put.set_title('PUT')
+    ax_put.set_xlabel('DTE')
+    ax_put.set_ylabel('Spot Price')
+    plt.yticks(rotation=0)
+    plt.tight_layout()
 # else generate PnL heatmaps
 else:
     call_value, put_value = b_scholes.calculate_price()
@@ -71,9 +87,9 @@ else:
 col1, col2 = st.columns([1,1], gap="small")
 
 with col1:
-    st.subheader("Call Price Heatmap")
+    st.subheader("European call option Heatmap")
     st.pyplot(fig_call)
 
 with col2:
-    st.subheader("Put Price Heatmap")
+    st.subheader("European put option Heatmap")
     st.pyplot(fig_put)

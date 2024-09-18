@@ -54,8 +54,77 @@ class BlackScholes:
             put_prices.append(put_row)
         return (call_prices, put_prices)
     
-    def calculate_greeks(self) -> Tuple[List[int], List[int], List[int], List[int], List[int]]:
-        pass
+    def calculate_greeks(self, greek:str) -> Tuple[List[List[int]], List[List[int]], List[List[int]], List[List[int]], List[List[int]]]:
+        call_greeks = []
+        put_greeks = []
+        match greek:
+            # Delta
+            case "Delta":
+                for underlying_price in self.price_range_display:
+                    call_row = []
+                    put_row = []
+                    for dte in self.time_list_display:
+                        d1 = (1/(self.volatility * np.sqrt(dte/365)))*(np.log(underlying_price/self.strike_price) +
+                                                                    (self.risk_free_rate+(self.volatility*self.volatility)/2)*(dte/365))
+                        d2 = d1 - self.volatility*np.sqrt(dte/365)
+                        call_row.append(norm.cdf(d1))
+                        put_row.append(-norm.cdf(-d2))
+                    call_greeks.append(call_row)
+                    put_greeks.append(put_row)
+            
+            case "Gamma":
+                for underlying_price in self.price_range_display:
+                    call_row = []
+                    put_row = []
+                    for dte in self.time_list_display:
+                        d1 = (1/(self.volatility * np.sqrt(dte/365)))*(np.log(underlying_price/self.strike_price) +
+                                                                    (self.risk_free_rate+(self.volatility*self.volatility)/2)*(dte/365))
+                        call_row.append(norm.pdf(d1)/(underlying_price*self.volatility*np.sqrt(dte/365)))
+                        put_row.append(norm.pdf(d1)/(underlying_price*self.volatility*np.sqrt(dte/365)))
+                    call_greeks.append(call_row)
+                    put_greeks.append(put_row)
+            
+            case "Vega":
+                for underlying_price in self.price_range_display:
+                    call_row = []
+                    put_row = []
+                    for dte in self.time_list_display:
+                        d1 = (1/(self.volatility * np.sqrt(dte/365)))*(np.log(underlying_price/self.strike_price) +
+                                                                    (self.risk_free_rate+(self.volatility*self.volatility)/2)*(dte/365))
+                        call_row.append(underlying_price*norm.pdf(d1)*np.sqrt(dte/365)*0.01) #want to look at change in vol per 1% change in underlying
+                        put_row.append(underlying_price*norm.pdf(d1)*np.sqrt(dte/365)*0.01)
+                    call_greeks.append(call_row)
+                    put_greeks.append(put_row)
+            
+            case "Theta":
+                for underlying_price in self.price_range_display:
+                    call_row = []
+                    put_row = []
+                    for dte in self.time_list_display:
+                        d1 = (1/(self.volatility * np.sqrt(dte/365)))*(np.log(underlying_price/self.strike_price) +
+                                                                    (self.risk_free_rate+(self.volatility*self.volatility)/2)*(dte/365))
+                        d2 = d1 - self.volatility*np.sqrt(dte/365)
+                        call_theta = ((-underlying_price*norm.pdf(d1)*self.volatility)/(2*np.sqrt(dte/365)))-self.risk_free_rate*self.strike_price*np.exp(-self.risk_free_rate*(dte/365))*norm.cdf(d2)
+                        put_theta = ((-underlying_price*norm.pdf(d1)*self.volatility)/(2*np.sqrt(dte/365)))-self.risk_free_rate*self.strike_price*np.exp(-self.risk_free_rate*(dte/365))*norm.cdf(-d2)
+                        call_row.append(call_theta/365) #look at theta per day, hence divide by 365
+                        put_row.append(put_theta/365)
+                    call_greeks.append(call_row)
+                    put_greeks.append(put_row)
+            
+            case "Rho":
+                for underlying_price in self.price_range_display:
+                    call_row = []
+                    put_row = []
+                    for dte in self.time_list_display:
+                        d1 = (1/(self.volatility * np.sqrt(dte/365)))*(np.log(underlying_price/self.strike_price) +
+                                                                    (self.risk_free_rate+(self.volatility*self.volatility)/2)*(dte/365))
+                        d2 = d1 - self.volatility*np.sqrt(dte/365)
+                        call_row.append(self.strike_price*(dte/365)*np.exp(-self.risk_free_rate*(dte/365))*norm.cdf(d2)*0.01) # look at changes per 1% change, hence multiply 0.01
+                        put_row.append(-self.strike_price*(dte/365)*np.exp(-self.risk_free_rate*(dte/365))*norm.cdf(-d2)*0.01)
+                    call_greeks.append(call_row)
+                    put_greeks.append(put_row)
+        return call_greeks, put_greeks 
+        
     
     @staticmethod
     def calculate_pnl(option_projected_val: List[List[int]], amount_paid: float, denomination: str) -> List[List[int]]:
