@@ -36,7 +36,7 @@ class BlackScholes:
         """
         call_prices = []
         put_prices = []
-        print(self.price_range_display)
+        #print(self.price_range_display)
         for underlying_price in self.price_range_display:
             call_row = []
             put_row = []
@@ -66,9 +66,8 @@ class BlackScholes:
                     for dte in self.time_list_display:
                         d1 = (1/(self.volatility * np.sqrt(dte/365)))*(np.log(underlying_price/self.strike_price) +
                                                                     (self.risk_free_rate+(self.volatility*self.volatility)/2)*(dte/365))
-                        d2 = d1 - self.volatility*np.sqrt(dte/365)
-                        call_row.append(norm.cdf(d1))
-                        put_row.append(-norm.cdf(-d2))
+                        call_row.append(round(norm.cdf(d1),3))
+                        put_row.append(round(-norm.cdf(-d1),3))
                     call_greeks.append(call_row)
                     put_greeks.append(put_row)
             
@@ -79,8 +78,8 @@ class BlackScholes:
                     for dte in self.time_list_display:
                         d1 = (1/(self.volatility * np.sqrt(dte/365)))*(np.log(underlying_price/self.strike_price) +
                                                                     (self.risk_free_rate+(self.volatility*self.volatility)/2)*(dte/365))
-                        call_row.append(norm.pdf(d1)/(underlying_price*self.volatility*np.sqrt(dte/365)))
-                        put_row.append(norm.pdf(d1)/(underlying_price*self.volatility*np.sqrt(dte/365)))
+                        call_row.append(round(norm.pdf(d1)/(underlying_price*self.volatility*np.sqrt(dte/365)),3))
+                        put_row.append(round(norm.pdf(d1)/(underlying_price*self.volatility*np.sqrt(dte/365)),3))
                     call_greeks.append(call_row)
                     put_greeks.append(put_row)
             
@@ -91,8 +90,8 @@ class BlackScholes:
                     for dte in self.time_list_display:
                         d1 = (1/(self.volatility * np.sqrt(dte/365)))*(np.log(underlying_price/self.strike_price) +
                                                                     (self.risk_free_rate+(self.volatility*self.volatility)/2)*(dte/365))
-                        call_row.append(underlying_price*norm.pdf(d1)*np.sqrt(dte/365)*0.01) #want to look at change in vol per 1% change in underlying
-                        put_row.append(underlying_price*norm.pdf(d1)*np.sqrt(dte/365)*0.01)
+                        call_row.append(round(underlying_price*norm.pdf(d1)*np.sqrt(dte/365)*0.01,3)) #want to look at change in vol per 1% change in underlying
+                        put_row.append(round(underlying_price*norm.pdf(d1)*np.sqrt(dte/365)*0.01,3))
                     call_greeks.append(call_row)
                     put_greeks.append(put_row)
             
@@ -105,9 +104,9 @@ class BlackScholes:
                                                                     (self.risk_free_rate+(self.volatility*self.volatility)/2)*(dte/365))
                         d2 = d1 - self.volatility*np.sqrt(dte/365)
                         call_theta = ((-underlying_price*norm.pdf(d1)*self.volatility)/(2*np.sqrt(dte/365)))-self.risk_free_rate*self.strike_price*np.exp(-self.risk_free_rate*(dte/365))*norm.cdf(d2)
-                        put_theta = ((-underlying_price*norm.pdf(d1)*self.volatility)/(2*np.sqrt(dte/365)))-self.risk_free_rate*self.strike_price*np.exp(-self.risk_free_rate*(dte/365))*norm.cdf(-d2)
-                        call_row.append(call_theta/365) #look at theta per day, hence divide by 365
-                        put_row.append(put_theta/365)
+                        put_theta = ((-underlying_price*norm.pdf(d1)*self.volatility)/(2*np.sqrt(dte/365)))+self.risk_free_rate*self.strike_price*np.exp(-self.risk_free_rate*(dte/365))*norm.cdf(-d2)
+                        call_row.append(round(call_theta/365,3)) #look at theta per day, hence divide by 365
+                        put_row.append(round(put_theta/365,3))
                     call_greeks.append(call_row)
                     put_greeks.append(put_row)
             
@@ -119,8 +118,8 @@ class BlackScholes:
                         d1 = (1/(self.volatility * np.sqrt(dte/365)))*(np.log(underlying_price/self.strike_price) +
                                                                     (self.risk_free_rate+(self.volatility*self.volatility)/2)*(dte/365))
                         d2 = d1 - self.volatility*np.sqrt(dte/365)
-                        call_row.append(self.strike_price*(dte/365)*np.exp(-self.risk_free_rate*(dte/365))*norm.cdf(d2)*0.01) # look at changes per 1% change, hence multiply 0.01
-                        put_row.append(-self.strike_price*(dte/365)*np.exp(-self.risk_free_rate*(dte/365))*norm.cdf(-d2)*0.01)
+                        call_row.append(round(self.strike_price*(dte/365)*np.exp(-self.risk_free_rate*(dte/365))*norm.cdf(d2)*0.01,3)) # look at changes per 1% change, hence multiply 0.01
+                        put_row.append(round(-self.strike_price*(dte/365)*np.exp(-self.risk_free_rate*(dte/365))*norm.cdf(-d2)*0.01,3))
                     call_greeks.append(call_row)
                     put_greeks.append(put_row)
         return call_greeks, put_greeks 
