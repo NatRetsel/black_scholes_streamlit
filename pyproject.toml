@@ -14,3 +14,4 @@ dependencies = [
     "streamlit>=1.45.0",
     "watchdog>=6.0.0",
 ]
+
